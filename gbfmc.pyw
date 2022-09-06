@@ -131,7 +131,7 @@ class GBFMC():
     def data2point(self):
         point_data = []
         for i in range(0, len(self.data)):
-            point_data.append([self.jsTimestampToJST(self.data[i][0]), self.data[i][1] / 1000000, self.data[i][2] / 10000001000000])
+            point_data.append([self.jsTimestampToJST(self.data[i][0]), self.data[i][1] / 1000000, self.data[i][2] / 1000000])
         return point_data
 
     def drawPointChart(self):
