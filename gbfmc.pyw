@@ -44,7 +44,7 @@ class GBFMC():
     def addPoint(self):
         try:
             clipboard = json.loads(pyperclip.paste())
-            self.data.append([clipboard['timestamp'], clipboard['you'], clipboard['opponent']])
+            self.data.append([clipboard['timestamp'], int(clipboard['you']), int(clipboard['opponent'])])
             self.pending = True
             if self.ui is not None: self.ui.events.append("The point has been added")
         except:
