@@ -10,6 +10,8 @@ from tkinter import messagebox
 
 class GBFMC():
     def __init__(self):
+        self.ver = "1.4"
+        print("Granblue Fantasy Match Chart v" + self.ver)
         self.ui = None
         self.data = []
         self.pending = False
@@ -54,23 +56,32 @@ class GBFMC():
         return datetime.fromtimestamp(int(t) // 1000) + timedelta(seconds=32400)
 
     def drawChart(self, plot, name, filename):
-        img = Image.new("RGB", (800, 600), (255,255,255))
+        img = Image.new("RGB", (1300, 850), (255,255,255))
         d = ImageDraw.Draw(img)
-        if self.font is None: self.font = ImageFont.truetype("font.ttf", 14)
+        if self.font is None: self.font = ImageFont.truetype("font.ttf", 16)
+        
+        # settings
+        chart_width = 1100
+        chart_height = 700
+        chart_offset_x = 100
+        chart_offset_y = 75
+        chart_step_x = 110
+        chart_step_y = 175
+        
         
         # y grid lines
         for i in range(0, 4):
-            d.line([(50, 50+125*i), (750, 50+125*i)], fill=(200, 200, 200), width=1)
+            d.line([(chart_offset_x, chart_offset_y+chart_step_y*i), (chart_width+chart_offset_x, chart_offset_y+chart_step_y*i)], fill=(200, 200, 200), width=1)
         # x grid lines
         for i in range(0, 10):
-            d.line([(120+70*i, 50), (120+70*i, 550)], fill=(200, 200, 200), width=1)
+            d.line([(chart_offset_x+chart_step_x*i, chart_offset_y), (chart_offset_x+chart_step_x*i, chart_height+chart_offset_y)], fill=(200, 200, 200), width=1)
         # legend
         d.text((10, 10),name,font=self.font,fill=(0,0,0))
-        d.line([(150, 15), (170, 15)], fill=(0, 0, 255), width=2)
+        d.line([(150, 15), (170, 15)], fill=(0, 0, 255), width=3)
         d.text((180, 10),"You",font=self.font,fill=(0,0,0))
-        d.line([(220, 15), (240, 15)], fill=(255, 0, 0), width=2)
+        d.line([(220, 15), (240, 15)], fill=(255, 0, 0), width=3)
         d.text((250, 10),"Opponent",font=self.font,fill=(0,0,0))
-        d.text((720, 580),"Time (JST)",font=self.font,fill=(0,0,0))
+        d.text((chart_width, chart_height+chart_offset_y+40),"Time (JST)",font=self.font,fill=(0,0,0))
         
         # y notes
         miny = 999
@@ -82,7 +93,7 @@ class GBFMC():
         if deltay <= 0: return None
         tvar = maxy
         for i in range(0, 5):
-            d.text((10, 40+125*i),"{:.2f}".format(float(tvar)).replace('.00', '').replace('.10', '.1').replace('.20', '.2').replace('.30', '.3').replace('.40', '.4').replace('.50', '.5').replace('.60', '.6').replace('.70', '.7').replace('.80', '.8').replace('.90', '.9').replace('.0', '').rjust(6),font=self.font,fill=(0,0,0))
+            d.text((chart_offset_x-60, chart_offset_y-10+chart_step_y*i),"{:.2f}".format(float(tvar)).replace('.00', '').replace('.10', '.1').replace('.20', '.2').replace('.30', '.3').replace('.40', '.4').replace('.50', '.5').replace('.60', '.6').replace('.70', '.7').replace('.80', '.8').replace('.90', '.9').replace('.0', '').rjust(6),font=self.font,fill=(0,0,0))
             tvar -= deltay / 4
         # x notes
         minx = plot[0][0]
@@ -92,7 +103,7 @@ class GBFMC():
         if deltax <= 0: return None
         tvar = minx
         for i in range(0, 11):
-            d.text((35+70*i, 560),"{:02d}:{:02d}".format(tvar.hour, tvar.minute),font=self.font,fill=(0,0,0))
+            d.text((chart_offset_x-15+chart_step_x*i, chart_height+chart_offset_y+10),"{:02d}:{:02d}".format(tvar.hour, tvar.minute),font=self.font,fill=(0,0,0))
             tvar += timedelta(seconds=deltax/10)
 
         # lines
@@ -100,18 +111,18 @@ class GBFMC():
         for p in plot:
             x = p[0] - minx
             x = (x.seconds + x.days * 86400)
-            x = 50 + 700 * (x / deltax)
+            x = chart_offset_x + chart_width * (x / deltax)
             y = maxy - p[1]
-            y = 50 + 500 * (y / deltay)
+            y = chart_offset_y + chart_height * (y / deltay)
             lines[0].append((x, y))
             y = maxy - p[2]
-            y = 50 + 500 * (y / deltay)
+            y = chart_offset_y + chart_height * (y / deltay)
             lines[1].append((x, y))
 
         # plot lines
-        d.line([(50, 50), (50, 550), (750, 550)], fill=(0, 0, 0), width=1)
-        d.line(lines[0], fill=(0, 0, 255), width=2, joint="curve")
-        d.line(lines[1], fill=(255, 0, 0), width=2, joint="curve")
+        d.line([(chart_offset_x, chart_offset_y), (chart_offset_x, chart_height+chart_offset_y), (chart_offset_x+chart_width, chart_height+chart_offset_y)], fill=(0, 0, 0), width=1)
+        d.line(lines[0], fill=(0, 0, 255), width=3, joint="curve")
+        d.line(lines[1], fill=(255, 0, 0), width=3, joint="curve")
 
         img.save(filename, format="PNG")
 
@@ -137,7 +148,7 @@ class GBFMC():
     def drawPointChart(self):
         plot = self.data2point()
         if len(plot) < 2: return False
-        self.drawChart(plot, "Scores", "score.png")
+        self.drawChart(plot, "Scores (M)", "score.png")
         return True
 
     def delta2str(self, delta, mode=1):
