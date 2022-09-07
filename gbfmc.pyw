@@ -10,7 +10,7 @@ from tkinter import messagebox
 
 class GBFMC():
     def __init__(self):
-        self.ver = "1.4"
+        self.ver = "1.5"
         print("Granblue Fantasy Match Chart v" + self.ver)
         self.ui = None
         self.data = []
@@ -173,11 +173,13 @@ class GBFMC():
             remaining = (end_time - last_timestamp)
             delta = 1000000 * (last_timestamp - first_timestamp).seconds / 60
             avg_speed = [(self.data[-1][1] - self.data[0][1]) / delta, (self.data[-1][2] - self.data[0][2]) / delta]
+            speed_points = self.data2speed()
+            current_speed = [speed_points[-1][1], speed_points[-1][2]]
             report = {}
             report["remaining"] = "Remaining Time: " + self.delta2str(remaining)
             report["lead"] = "Difference: {:,}".format(self.data[-1][1] - self.data[-1][2])
-            report["you"] = "Current Score: {:,}\nAverage Speed: {:.2f}M/min\nTop Speed: {:.2f}M/min\nEstimations: {:,} to {:,}".format(self.data[-1][1], avg_speed[0], max_speed[0], math.ceil(self.data[-1][1] + 1000000 * avg_speed[0] * remaining.seconds / 60), math.ceil(self.data[-1][1] + 1000000 * max_speed[0] * remaining.seconds / 60))
-            report["opponent"] = "Current Score: {:,}\nAverage Speed: {:.2f}M/min\nTop Speed: {:.2f}M/min\nEstimations: {:,} to {:,}".format(self.data[-1][2], avg_speed[1], max_speed[1], math.ceil(self.data[-1][2] + 1000000 * avg_speed[1] * remaining.seconds / 60), math.ceil(self.data[-1][2] + 1000000 * max_speed[1] * remaining.seconds / 60))
+            report["you"] = "Current Score: {:,}\nCurrent Speed: {:.2f}M/min\nAverage Speed: {:.2f}M/min\nTop Speed: {:.2f}M/min\nEstimations: {:,} to {:,}".format(self.data[-1][1], current_speed[0], avg_speed[0], max_speed[0], math.ceil(self.data[-1][1] + 1000000 * current_speed[0] * remaining.seconds / 60), math.ceil(self.data[-1][1] + 1000000 * max_speed[0] * remaining.seconds / 60))
+            report["opponent"] = "Current Score: {:,}\nCurrent Speed: {:.2f}M/min\nAverage Speed: {:.2f}M/min\nTop Speed: {:.2f}M/min\nEstimations: {:,} to {:,}".format(self.data[-1][2], current_speed[1], avg_speed[1], max_speed[1], math.ceil(self.data[-1][2] + 1000000 * current_speed[1] * remaining.seconds / 60), math.ceil(self.data[-1][2] + 1000000 * max_speed[1] * remaining.seconds / 60))
         return report
 
     def run(self):
