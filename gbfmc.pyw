@@ -171,7 +171,7 @@ class GBFMC():
         if last_timestamp is not None:
             end_time = last_timestamp.replace(day=last_timestamp.day+1, hour=0, minute=0, second=0, microsecond=0)
             remaining = (end_time - last_timestamp)
-            delta = 1000000 * (last_timestamp - first_timestamp).seconds / 60
+            delta = 1000000 * ((last_timestamp - first_timestamp).days * 86400 + (last_timestamp - first_timestamp).seconds) / 60
             avg_speed = [(self.data[-1][1] - self.data[0][1]) / delta, (self.data[-1][2] - self.data[0][2]) / delta]
             speed_points = self.data2speed()
             current_speed = [speed_points[-1][1], speed_points[-1][2]]
